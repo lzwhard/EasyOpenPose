@@ -37,3 +37,8 @@ finish. save result to 'test_openpose.jpg', people: 3
 
 # 引用
 https://github.com/CMU-Perceptual-Computing-Lab/openpose
+
+# add BODY25 support
+```
+.build_debug/examples/EasyOpenPose25/easyOpenPose.bin /workdir/EasyOpenPose/test.jpg   0 400 279 /workdir/openpose/models/pose/body_25/pose_deploy.prototxt /body_25/pose_deploy.prototxt   /workdir/openpose/models/pose/body_25/pose_iter_584000.caffemodel
+```

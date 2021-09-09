@@ -109,31 +109,38 @@ struct BlobData{
 	int channels;
 	int height;
 	int width;
-	int capacity_count;		//±£Áô¿Õ¼äµÄÔªËØ¸öÊý³¤¶È£¬×Ö½ÚÊýÇë * sizeof(float)
+	int capacity_count;		//ï¿½ï¿½ï¿½ï¿½ï¿½Õ¼ï¿½ï¿½Ôªï¿½Ø¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È£ï¿½ï¿½Ö½ï¿½ï¿½ï¿½ï¿½ï¿½ * sizeof(float)
 };
 
-#define POSE_COCO_COLORS_RENDER_GPU \
-	255.f, 0.f, 85.f, \
-	255.f, 0.f, 0.f, \
-	255.f, 85.f, 0.f, \
-	255.f, 170.f, 0.f, \
-	255.f, 255.f, 0.f, \
-	170.f, 255.f, 0.f, \
-	85.f, 255.f, 0.f, \
-	0.f, 255.f, 0.f, \
-	0.f, 255.f, 85.f, \
-	0.f, 255.f, 170.f, \
-	0.f, 255.f, 255.f, \
-	0.f, 170.f, 255.f, \
-	0.f, 85.f, 255.f, \
-	0.f, 0.f, 255.f, \
-	255.f, 0.f, 170.f, \
-	170.f, 0.f, 255.f, \
-	255.f, 0.f, 255.f, \
-	85.f, 0.f, 255.f
+ #define POSE_COCO_COLORS_RENDER_GPU \
+        255.f,     0.f,    85.f, \
+        255.f,     0.f,     0.f, \
+        255.f,    85.f,     0.f, \
+        255.f,   170.f,     0.f, \
+        255.f,   255.f,     0.f, \
+        170.f,   255.f,     0.f, \
+         85.f,   255.f,     0.f, \
+          0.f,   255.f,     0.f, \
+        255.f,     0.f,     0.f, \
+          0.f,   255.f,    85.f, \
+          0.f,   255.f,   170.f, \
+          0.f,   255.f,   255.f, \
+          0.f,   170.f,   255.f, \
+          0.f,    85.f,   255.f, \
+          0.f,     0.f,   255.f, \
+        255.f,     0.f,   170.f, \
+        170.f,     0.f,   255.f, \
+        255.f,     0.f,   255.f, \
+         85.f,     0.f,   255.f, \
+          0.f,     0.f,   255.f, \
+          0.f,     0.f,   255.f, \
+          0.f,     0.f,   255.f, \
+          0.f,   255.f,   255.f, \
+          0.f,   255.f,   255.f, \
+          0.f,   255.f,   255.f
 
 const std::vector<float> POSE_COCO_COLORS_RENDER{ POSE_COCO_COLORS_RENDER_GPU };
-const std::vector<unsigned int> POSE_COCO_PAIRS_RENDER{1, 2, 1, 5, 2, 3, 3, 4, 5, 6, 6, 7, 1, 8, 8, 9, 9, 10, 1, 11, 11, 12, 12, 13, 1, 0, 0, 14, 14, 16, 0, 15, 15, 17};
+const std::vector<unsigned int> POSE_COCO_PAIRS_RENDER{1,8,   1,2,   1,5,   2,3,   3,4,   5,6,   6,7,   8,9,   9,10,  10,11, 8,12,  12,13, 13,14,  1,0,   0,15, 15,17,  0,16, 16,18,   2,17,  5,18,   14,19,19,20,14,21, 11,22,22,23,11,24};
 const unsigned int POSE_MAX_PEOPLE = 96;
 
 //656x368
@@ -157,17 +164,19 @@ Mat getImage(const Mat& im, Size baseSize = Size(656, 368), float* scale = 0){
 	return bck;
 }
 
-//¸ù¾ÝµÃµ½µÄ½á¹û£¬Á¬½ÓÉíÌåÇøÓò
+//ï¿½ï¿½ï¿½ÝµÃµï¿½ï¿½Ä½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 void connectBodyPartsCpu(vector<float>& poseKeypoints, const float* const heatMapPtr, const float* const peaksPtr,
 	const Size& heatMapSize, const int maxPeaks, const int interMinAboveThreshold,
 	const float interThreshold, const int minSubsetCnt, const float minSubsetScore, const float scaleFactor, vector<int>& keypointShape)
 {
 	keypointShape.resize(3);
-	const std::vector<unsigned int> POSE_COCO_PAIRS{ 1, 2, 1, 5, 2, 3, 3, 4, 5, 6, 6, 7, 1, 8, 8, 9, 9, 10, 1, 11, 11, 12, 12, 13, 1, 0, 0, 14, 14, 16, 0, 15, 15, 17, 2, 16, 5, 17 };
-	const std::vector<unsigned int> POSE_COCO_MAP_IDX{ 31, 32, 39, 40, 33, 34, 35, 36, 41, 42, 43, 44, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 47, 48, 49, 50, 53, 54, 51, 52, 55, 56, 37, 38, 45, 46 };
+	const std::vector<unsigned int> POSE_COCO_PAIRS{ 1,8,   1,2,   1,5,   2,3,   3,4,   5,6,   6,7,   8,9,   9,10,  10,11, 8,12,  12,13, 13,14,  1,0,   0,15, 15,17,  0,16, 16,18,   2,17,  5,18,   14,19,19,20,14,21, 11,22,22,23,11,24 };
+	// const std::vector<unsigned int> POSE_COCO_MAP_IDX{ 0,1, 14,15, 22,23, 16,17, 18,19, 24,25, 26,27, 6,7, 2,3, 4,5, 8,9, 10,11, 12,13, 30,31, 32,33, 36,37, 34,35, 38,39, 20,21, 28,29, 40,41,42,43,44,45, 46,47,48,49,50,51};
+	const std::vector<unsigned int> POSE_COCO_MAP_IDX{ 26, 27, 40, 41, 48, 49, 42, 43, 44, 45, 50, 51, 52, 53, 32, 33, 28, 29, 30, 31, 34, 35, 36, 37, 38, 39, 56, 57, 58, 59, 62, 63, 60, 61, 64, 65, 46, 47, 54, 55, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77};
+	
 	const auto& bodyPartPairs = POSE_COCO_PAIRS;
 	const auto& mapIdx = POSE_COCO_MAP_IDX;
-	const auto numberBodyParts = 18;
+	const auto numberBodyParts = 25;
 
 	const auto numberBodyPartPairs = bodyPartPairs.size() / 2;
 
@@ -335,7 +344,12 @@ void connectBodyPartsCpu(vector<float>& poseKeypoints, const float* const heatMa
 				}
 			}
 			// Add ears connections (in case person is looking to opposite direction to camera)
-			else if (pairIndex == 17 || pairIndex == 18)
+			else if (
+                            (numberBodyParts == 18 && (pairIndex==17 || pairIndex==18))
+                            || ((numberBodyParts == 19 || (numberBodyParts == 25)
+                                 || numberBodyParts == 59 || numberBodyParts == 65)
+                                && (pairIndex==18 || pairIndex==19))
+                            )
 			{
 				for (const auto& connectionKI : connectionK)
 				{
@@ -445,13 +459,13 @@ void connectBodyPartsCpu(vector<float>& poseKeypoints, const float* const heatMa
 //topShape[2] = maxPeaks + 1; // # maxPeaks + 1                    97 = 96 + 1
 //topShape[3] = 3;  // X, Y, score                                 3
 
-//bottom_blobÊÇÊäÈë£¬topÊÇÊä³ö
+//bottom_blobï¿½ï¿½ï¿½ï¿½ï¿½ë£¬topï¿½ï¿½ï¿½ï¿½ï¿½
 void nms(BlobData* bottom_blob, BlobData* top_blob, float threshold){
-	//maxPeaks¾ÍÊÇ×î´óÈËÊý£¬+1ÊÇÎªÁËµÚÒ»Î»´æ¸öÊý
-	//Ëã·¨£¬ÊÇÃ¿¸öµã£¬Èç¹û´óÓÚãÐÖµ£¬Í¬Ê±´óÓÚÉÏÏÂ×óÓÒÖµµÄÊ±ºò£¬ÔòÈÏÎªÊÇ·åÖµ
+	//maxPeaksï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½+1ï¿½ï¿½Îªï¿½Ëµï¿½Ò»Î»ï¿½ï¿½ï¿½ï¿½ï¿½
+	//ï¿½ã·¨ï¿½ï¿½ï¿½ï¿½Ã¿ï¿½ï¿½ï¿½ã£¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½Í¬Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½Ç·ï¿½Öµ
 
-	//Ëã·¨ºÜ¼òµ¥£¬featuremapµÄÈÎÒâÒ»¸öµã£¬ÆäÉÏÏÂ×óÓÒºÍÐ±ÉÏÏÂ×óÓÒ£¬¶¼Ð¡ÓÚ×ÔÉí£¬¾ÍÈÏÎªÊÇÒªµÄµã
-	//È»ºóÒÔ¸ÃµãÇøÓò£¬Ñ¡Ôñ7*7ÇøÓò£¬°´ÕÕµÃ·ÖÖµºÍx¡¢yÀ´¼ÆËã×îºÏÊÊµÄÑÇÏñËØ×ø±ê
+	//ï¿½ã·¨ï¿½Ü¼òµ¥£ï¿½featuremapï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ã£¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òºï¿½Ð±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò£ï¿½ï¿½ï¿½Ð¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½Òªï¿½Äµï¿½
+	//È»ï¿½ï¿½ï¿½Ô¸Ãµï¿½ï¿½ï¿½ï¿½ï¿½Ñ¡ï¿½ï¿½7*7ï¿½ï¿½ï¿½ò£¬°ï¿½ï¿½ÕµÃ·ï¿½Öµï¿½ï¿½xï¿½ï¿½yï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Êµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 	int w = bottom_blob->width;
 	int h = bottom_blob->height;
@@ -482,7 +496,7 @@ void nms(BlobData* bottom_blob, BlobData* top_blob, float threshold){
 							&& value > left && value > right
 							&& value > bottomLeft && value > bottom && value > bottomRight)
 						{
-							//¼ÆËãÑÇÏñËØ×ø±ê
+							//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 							float xAcc = 0;
 							float yAcc = 0;
 							float scoreAcc = 0;
@@ -693,8 +707,8 @@ int main(int argc, char** argv){
 
 	Blob<float>* input_layer = net_->input_blobs()[0];
 	Size input_size(input_layer->width(), input_layer->height());
-	BlobData* nms_out = createBlob_local(1, 56, POSE_MAX_PEOPLE + 1, 3);
-	BlobData* input = createBlob_local(1, 57, baseSize.height, baseSize.width);
+	BlobData* nms_out = createBlob_local(1, 77, POSE_MAX_PEOPLE + 1, 3);
+	BlobData* input = createBlob_local(1, 78, baseSize.height, baseSize.width);
 	float scale = 0;
 	vector<float> keypoints;
 	vector<int> shape;
@@ -714,10 +728,10 @@ int main(int argc, char** argv){
 		input_data += input_size.area();
 	}
 
-	//»ñÈ¡Ò»Ö¡Í¼Æ¬£¬¸ù¾ÝÔ¼¶¨µÄ´óÐ¡£¬ÕâÖÖ·½·¨ÊÇÎªÁË±£Ö¤Í¼ÏñµÄ¿í¸ß±È²»±ä
+	//ï¿½ï¿½È¡Ò»Ö¡Í¼Æ¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô¼ï¿½ï¿½ï¿½Ä´ï¿½Ð¡ï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½Ë±ï¿½Ö¤Í¼ï¿½ï¿½Ä¿ï¿½ï¿½ß±È²ï¿½ï¿½ï¿½
 	im = getImage(raw_image, baseSize, &scale);
 	
-	//ÕâÒ»²½×ª»»¼Ó¼õÈ¥¾ùÖµ£¬ÊÖ¶¯²Ù×÷
+	//ï¿½ï¿½Ò»ï¿½ï¿½×ªï¿½ï¿½ï¿½Ó¼ï¿½È¥ï¿½ï¿½Öµï¿½ï¿½ï¿½Ö¶ï¿½ï¿½ï¿½ï¿½ï¿½
 	im.convertTo(im, CV_32F, 1 / 256.f, -0.5);
 
 	split(im, input_channels);
@@ -732,25 +746,25 @@ int main(int argc, char** argv){
 
 	BlobData* net_output = createBlob_local(net_output_blob->num(), net_output_blob->channels(), net_output_blob->height(), net_output_blob->width());
 
-	//»ñÈ¡ÍøÂçÊä³ö£¬inplace
+	//ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½inplace
 	memcpy(net_output->list, net_output_data_begin, net_output_blob->count() * sizeof(float));
 
-	//°Ñheatmap¸øresizeµ½Ô¼¶¨´óÐ¡
+	//ï¿½ï¿½heatmapï¿½ï¿½resizeï¿½ï¿½Ô¼ï¿½ï¿½ï¿½ï¿½Ð¡
 	for (int i = 0; i < net_output->channels; ++i){
 		Mat um(baseSize.height, baseSize.width, CV_32F, input->list + baseSize.height*baseSize.width*i);
 
-		//featuremapµÄresize²åÖµ·½·¨ºÜÓÐ¹ØÏµ
+		//featuremapï¿½ï¿½resizeï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¹ï¿½Ïµ
 		resize(Mat(net_output->height, net_output->width, CV_32F, net_output->list + net_output->width*net_output->height*i), um, baseSize, 0, 0, CV_INTER_CUBIC);
 	}
 
-	//»ñÈ¡Ã¿¸öfeature mapµÄ¾Ö²¿¼«´óÖµ
+	//ï¿½ï¿½È¡Ã¿ï¿½ï¿½feature mapï¿½Ä¾Ö²ï¿½ï¿½ï¿½ï¿½ï¿½Öµ
 	nms(input, nms_out, 0.05);
 
-	//µÃµ½¾Ö²¿¼«´óÖµºó£¬¸ù¾ÝPAFs¡¢points×ö²¿¼þÁ¬½Ó
+	//ï¿½Ãµï¿½ï¿½Ö²ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½ó£¬¸ï¿½ï¿½ï¿½PAFsï¿½ï¿½pointsï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	connectBodyPartsCpu(keypoints, input->list, nms_out->list, baseSize, POSE_MAX_PEOPLE, 9, 0.05, 3, 0.4, 1, shape);
 
 	//printf("render to image.\n");
-	//»æÍ¼£¬ÏÔÊ¾
+	//ï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½Ê¾
 	renderPoseKeypointsCpu(raw_image, keypoints, shape, 0.05, scale);
 	
 	printf("finish. save result to 'test_openpose.jpg', people: %d\n", shape[0]);
